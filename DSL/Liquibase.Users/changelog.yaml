@@ -1,3 +1,5 @@
 databaseChangeLog:
-  - includeAll:
-      path: changelog/
+  - include:
+      file: changelog/1689600000-create-tables.sql
+  - include:
+      file: changelog/1686607236-create-dev-ops-role.sql
