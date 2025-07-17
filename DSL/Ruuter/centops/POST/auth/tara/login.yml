@@ -27,7 +27,7 @@ get_tara_user_info:
 getUser:
   call: http.post
   args:
-    url: "[#CENTOPS_RESQL_USERS]/get-user-by-id-code"
+    url: "[#CENTOPS_RESQL]/get-user-by-id-code"
     body:
       idCode: ${tara_info.response.body.personalCode}
   result: user_info
@@ -47,7 +47,7 @@ assignUser:
 get_session_length:
   call: http.post
   args:
-    url: "[#CENTOPS_RESQL_USERS]/get-configuration"
+    url: "[#CENTOPS_RESQL]/get-configuration"
     body:
       key: "session_length"
   result: session_result
