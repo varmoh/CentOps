@@ -49,11 +49,24 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
                                  referencedColumnNames="id"
                                  referencedTableName="user"/>
 
-        <loadData
-                file="data/authority.csv"
-                separator=";"
-                tableName="authority">
-            <column name="name" type="string"/>
-        </loadData>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_ADMINISTRATOR"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_SERVICE_MANAGER"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_CUSTOMER_SUPPORT_AGENT"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_CHATBOT_TRAINER"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_ANALYST"/>
+        </insert>
+        <insert tableName="authority">
+            <column name="name" value="ROLE_UNAUTHENTICATED"/>
+        </insert>
+
     </changeSet>
 </databaseChangeLog>
