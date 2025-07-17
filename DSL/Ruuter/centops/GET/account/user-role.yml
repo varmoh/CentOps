@@ -38,7 +38,7 @@ assignIdCode:
 getUserRole:
   call: http.post
   args:
-    url: "[#CENTOPS_RESQL_USERS]/get-user-role"
+    url: "[#CENTOPS_RESQL]/get-user-role"
     body:
       userIdCode: ${idCode}
   result: roles_res
