@@ -78,8 +78,8 @@ assign_cookie:
     setCookie:
       customJwtCookie: ${cookie_result.response.body.token}
       Domain: "[#DOMAIN]"
-      Secure: false
-      HttpOnly: false
+      Secure: true
+      HttpOnly: true
       SameSite: "[#COOKIE_SAME_SITE]"
   next: return_value
 
