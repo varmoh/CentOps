@@ -22,7 +22,10 @@ get_user_info:
     plaintext:
       "customJwtCookie"
   result: res
-  next: check_user_info_response
+#  next: check_user_info_response
+
+logstep:
+  log: ${res}
 
 check_user_info_response:
   switch:
