@@ -27,8 +27,11 @@ get_user_info:
 check_user_info_response:
   switch:
     - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
-      next: assignIdCode
+      next: logstep
   next: returnNotFound
+
+logstep:
+  log: ${res.response}
 
 assignIdCode:
   assign:
