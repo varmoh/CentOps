@@ -58,6 +58,9 @@ export default defineConfig({
       process.env.REACT_APP_PUBLIC_URL
     ),
     'import.meta.env.REACT_APP_MENU_JSON': JSON.stringify(JSON.stringify(menu)),
+    'import.meta.env.REACT_APP_PROJECT_LAYER': JSON.stringify(
+      process.env.REACT_APP_PROJECT_LAYER
+    ),
   },
   css: {
     preprocessorOptions: {
