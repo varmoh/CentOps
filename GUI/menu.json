@@ -2,17 +2,17 @@
   {
     "id": "clients",
     "label": { "et": "Clients", "en": "Clients" },
-    "path": "/clients"
+    "path": "/centops/clients"
   },
   {
     "id": "users",
     "label": { "et": "Users", "en": "Users" },
-    "path": "/users"
+    "path": "/centops/users"
   },
   {
     "id": "clusters",
     "label": { "et": "Clusters", "en": "Clusters" },
-    "path": "/clusters"
+    "path": "/centops/clusters"
   },
   {
     "id": "audit",
@@ -20,7 +20,7 @@
     "children": [
       {
         "label": { "et": "User activity", "en": "User activity" },
-        "path": "/audit/user-activity"
+        "path": "/centops/audit/user-activity"
       },
       {
         "label": { "et": "Secrets access", "en": "Secrets access" },
@@ -31,6 +31,6 @@
   {
     "id": "documentation",
     "label": { "et": "Documentation", "en": "Documentation" },
-    "path": "/documentation"
+    "path": "/centops/documentation"
   }
 ]
