@@ -1,11 +1,11 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Description placeholder for 'USER-ROLE'"
+  description: "Decription placeholder for 'USER-ROLE'"
   method: get
   accepts: json
   returns: json
-  namespace: centops
+  namespace: backoffice
   allowlist:
     header:
       - field: cookie
@@ -15,17 +15,14 @@ declaration:
 get_user_info:
   call: http.post
   args:
-    url: "[#CENTOPS_TIM]/jwt/custom-jwt-userinfo"
-    contentType: plaintext
-    headers:
-      cookie: ${incoming.headers.cookie}
-    plaintext:
+   url: "[#CENTOPS_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
       "customJwtCookie"
   result: res
-#  next: check_user_info_response
-
-logstep:
-  log: ${res}
+  next: check_user_info_response
 
 check_user_info_response:
   switch:
