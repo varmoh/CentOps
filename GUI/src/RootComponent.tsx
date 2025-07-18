@@ -1,6 +1,6 @@
 import 'styles/main.scss';
 import type { FC } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout, MainNavigation } from 'components';
 import {
   CreateInvitationPage,
@@ -42,6 +42,7 @@ import { SecretAccessPage } from 'pages/audit/SecretAccessPage';
 export const RootComponent: FC = () => {
   return (
     <Routes>
+      <Route path={`/`} element={<Navigate to={ROUTES.CLIENT_LIST_ROUTE} />} />
       <Route element={<Layout navigation={<MainNavigation />} />}>
         <Route path={ROUTES.CLIENT_LIST_ROUTE} Component={ClientListPage} />
         <Route
