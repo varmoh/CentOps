@@ -27,8 +27,11 @@ get_user_info:
 check_user_info_response:
   switch:
     - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
-      next: assignIdCode
+      next: logstep
   next: returnNotFound
+
+logstep:
+  log: ${res.response}
 
 assignIdCode:
   assign:
@@ -38,7 +41,7 @@ assignIdCode:
 getUserRole:
   call: http.post
   args:
-    url: "[#CENTOPS_RESQL_USERS]/get-user-role"
+    url: "[#CENTOPS_RESQL]/get-user-role"
     body:
       userIdCode: ${idCode}
   result: roles_res
