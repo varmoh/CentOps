@@ -109,7 +109,7 @@ clean_vault() {
 load_config() {
     log "Loading configuration..."
 
-    # Set direct defaults (no .env-values loading)
+    # Set direct defaults
     VAULT_CONTAINER_NAME="vault"
     VAULT_DATA_PATH=$(clean_path "$HOME/.vault")
 
@@ -122,23 +122,6 @@ load_config() {
     fi
 
     log "Configuration loaded"
-
-    # Check ALL required variables with consistent error messages
-    : "${POSTGRES_USER:?ERROR: POSTGRES_USER is not set}"
-    : "${POSTGRES_PASSWORD:?ERROR: POSTGRES_PASSWORD is not set}"
-    : "${POSTGRES_DATABASES:?ERROR: POSTGRES_DATABASES is not set}"
-    : "${RESQL_DATASOURCE_NAME:?ERROR: RESQL_DATASOURCE_NAME is not set}"
-    : "${RESQL_JDBC_URL:?ERROR: RESQL_JDBC_URL is not set}"
-    : "${RESQL_USERNAME:?ERROR: RESQL_USERNAME is not set}"
-    : "${RESQL_PASSWORD:?ERROR: RESQL_PASSWORD is not set}"
-    : "${RESQL_USERS_DATASOURCE_NAME:?ERROR: RESQL_USERS_DATASOURCE_NAME is not set}"
-    : "${RESQL_USERS_JDBC_URL:?ERROR: RESQL_USERS_JDBC_URL is not set}"
-    : "${RESQL_USERS_USERNAME:?ERROR: RESQL_USERS_USERNAME is not set}"
-    : "${RESQL_USERS_PASSWORD:?ERROR: RESQL_USERS_PASSWORD is not set}"
-    : "${TIM_POSTGRES_USER:?ERROR: TIM_POSTGRES_USER is not set}"
-    : "${TIM_POSTGRES_PASSWORD:?ERROR: TIM_POSTGRES_PASSWORD is not set}"
-    : "${TIM_POSTGRES_DB:?ERROR: TIM_POSTGRES_DB is not set}"
-    : "${TIM_POSTGRES_HOST_AUTH_METHOD:?ERROR: TIM_POSTGRES_HOST_AUTH_METHOD is not set}"
 }
 
 initialize_vault() {
@@ -243,33 +226,40 @@ configure_secrets() {
         exit 1
     fi
 
-    # Database secrets
-    RESQL_OUTPUT=$(docker exec vault env VAULT_TOKEN="$VAULT_TOKEN" vault kv put secret/resql \
-        sqlms_datasources_0_name="$RESQL_DATASOURCE_NAME" \
-        sqlms_datasources_0_jdbcUrl="$RESQL_JDBC_URL" \
-        sqlms_datasources_0_username="$RESQL_USERNAME" \
-        sqlms_datasources_0_password="$RESQL_PASSWORD" 2>&1)
-    if ! echo "$RESQL_OUTPUT" | grep -q 'Success!'; then log "Error writing secret/resql: $RESQL_OUTPUT"; exit 1; fi
+    # Read .env-secrets and group variables by prefix
+    declare -A secret_groups
+    while IFS='=' read -r key value; do
+        # Skip empty lines or comments
+        [[ -z "$key" || "$key" =~ ^# ]] && continue
+        # Extract prefix (e.g., RESQL, RESQL_USERS, POSTGRES, TIM)
+        prefix=$(echo "$key" | cut -d'_' -f1)
+        # Normalize prefix to lowercase for Vault path
+        secret_path=$(echo "$prefix" | tr '[:upper:]' '[:lower:]')
+        # Store key-value pair in associative array
+        secret_groups["$secret_path,$key"]="$value"
+    done < ./vault/.env-secrets
 
-    RESQL_USERS_OUTPUT=$(docker exec vault env VAULT_TOKEN="$VAULT_TOKEN" vault kv put secret/resql-users \
-        sqlms_datasources_0_name="$RESQL_USERS_DATASOURCE_NAME" \
-        sqlms_datasources_0_jdbcUrl="$RESQL_USERS_JDBC_URL" \
-        sqlms_datasources_0_username="$RESQL_USERS_USERNAME" \
-        sqlms_datasources_0_password="$RESQL_USERS_PASSWORD" 2>&1)
-    if ! echo "$RESQL_USERS_OUTPUT" | grep -q 'Success!'; then log "Error writing secret/resql-users: $RESQL_USERS_OUTPUT"; exit 1; fi
-
-    DATABASE_OUTPUT=$(docker exec vault env VAULT_TOKEN="$VAULT_TOKEN" vault kv put secret/database \
-        POSTGRES_USER="$POSTGRES_USER" \
-        POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
-        POSTGRES_MULTIPLE_DATABASES="$POSTGRES_DATABASES" 2>&1)
-    if ! echo "$DATABASE_OUTPUT" | grep -q 'Success!'; then log "Error writing secret/database: $DATABASE_OUTPUT"; exit 1; fi
-
-    TIM_OUTPUT=$(docker exec vault env VAULT_TOKEN="$VAULT_TOKEN" vault kv put secret/tim-postgresql \
-        POSTGRES_USER="$TIM_POSTGRES_USER" \
-        POSTGRES_PASSWORD="$TIM_POSTGRES_PASSWORD" \
-        POSTGRES_DB="$TIM_POSTGRES_DB" \
-        POSTGRES_HOST_AUTH_METHOD="$TIM_POSTGRES_HOST_AUTH_METHOD" 2>&1)
-    if ! echo "$TIM_OUTPUT" | grep -q 'Success!'; then log "Error writing secret/tim-postgresql: $TIM_OUTPUT"; exit 1; fi
+    # Process each unique prefix
+    for prefix in $(echo "${!secret_groups[@]}" | tr ' ' '\n' | cut -d',' -f1 | sort -u); do
+        log "Storing secrets for $prefix..."
+        # Build Vault kv put command dynamically
+        vault_cmd="docker exec vault env VAULT_TOKEN=\"$VAULT_TOKEN\" vault kv put secret/$prefix"
+        for key in "${!secret_groups[@]}"; do
+            if [[ "$key" == "$prefix,"* ]]; then
+                # Extract the key without prefix
+                full_key=$(echo "$key" | cut -d',' -f2)
+                value="${secret_groups[$key]}"
+                vault_cmd="$vault_cmd $full_key=\"$value\""
+            fi
+        done
+        # Execute the Vault command
+        OUTPUT=$(eval "$vault_cmd" 2>&1)
+        if ! echo "$OUTPUT" | grep -q 'Success!'; then
+            log "Error writing secret/$prefix: $OUTPUT"
+            exit 1
+        fi
+        log "Successfully stored secret/$prefix"
+    done
 
     log "Secrets configured"
 }
@@ -286,7 +276,7 @@ start_vault_agent() {
         return
     fi
 
-    # Simply restart the container (no directory manipulation needed)
+    # Simply restart the container
     log "Restarting vault-agent container..."
     docker compose up -d --force-recreate vault-agent
 
