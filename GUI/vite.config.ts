@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     port: 8057,
     host: '0.0.0.0',
-    allowedHosts: process.env.ALLOWED_HOSTS === 'true',
+    allowedHosts: true,
   },
   plugins: [
     react(),
