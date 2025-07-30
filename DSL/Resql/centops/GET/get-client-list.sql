@@ -5,6 +5,7 @@ SELECT client_id,
        authentication_certificate,
        created_at,
        updated_at,
+       part_of_network,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM clients c
 WHERE id = (SELECT max(id) FROM clients WHERE client_id = c.client_id)
