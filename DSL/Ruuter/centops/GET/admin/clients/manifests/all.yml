@@ -11,11 +11,22 @@ declaration:
       - field: clientId
         type: string
         description: "Unique identifier of the client"
+      - field: page
+        type: number
+      - field: pageSize
+        type: number
 
 check_for_required_parameters:
   switch:
     - condition: ${incoming.params.clientId == null}
       next: return_incorrect_request
+  next: assign_parameters
+
+assign_parameters:
+  assign:
+    client_id: ${incoming.params.clientId}
+    page: ${incoming.params.page ?? 1}
+    page_size: ${incoming.params.pageSize ?? 10}
   next: get_manifests
 
 get_manifests:
@@ -23,14 +34,26 @@ get_manifests:
   args:
     url: "[#CENTOPS_RESQL]/get-manifests-by-client-id"
     body:
-      client_id: ${incoming.params.clientId}
-  result: results
-  next: return_result
+      client_id: ${client_id}
+      page: ${page}
+      page_size: ${page_size}
+  result: manifests_result
 
-return_result:
-  wrapper: false
+transform:
+  call: http.post
+  args:
+    url: "[#CENTOPS_DMAPPER_HBS]/transform-manifests"
+    headers:
+      type: "json"
+    body:
+      entries: ${manifests_result.response.body}
+      page: ${page}
+      pageSize: ${page_size}
+  result: manifests
+
+return_manifests:
   status: 200
-  return: ${results.response.body}
+  return: ${manifests.response.body}
   next: end
 
 return_incorrect_request:
