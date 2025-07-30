@@ -6,7 +6,8 @@
     "firstName": "{{firstName}}",
     "lastName": "{{lastName}}",
     "idCode": "{{idCode}}",
-    "createdAt": "{{createdAt}}"
+    "createdAt": "{{createdAt}}",
+    "updatedAt": {{#if updatedAt}}"{{updatedAt}}"{{else}}null{{/if}}
     }{{#unless @last}},{{/unless}}
 {{/each}}
 ],
