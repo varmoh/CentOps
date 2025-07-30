@@ -80,6 +80,20 @@ validate_certificates:
   switch:
     - condition: ${publicKey == null || privateKey == null }
       next: return_certificate_generation_failed
+  next: save_private_key_to_vault
+
+save_private_key_to_vault:
+  call: http.post
+  args:
+    url: "[#VAULT_ADDR]/v1/[#VAULT_BASE_PATH]/certificates/${clientName}"
+    headers:
+      X-Vault-Token: "[#VAULT_TOKEN]"
+      Content-Type: application/json
+    body:
+      data:
+        private_key: ${privateKey}
+  result: vault_result
+  error: return_certificate_generation_failed
   next: save_certificate_metadata
 
 save_certificate_metadata:
@@ -101,20 +115,6 @@ check_certificate_metadata_response:
 assign_certificate_metadata:
   assign:
     certificateId: ${certificate_metadata_result.response.body[0].certificateId}
-  next: save_private_key_to_vault
-
-save_private_key_to_vault:
-  call: http.post
-  args:
-    url: "[#VAULT_ADDR]/v1/[#VAULT_BASE_PATH]/certificates/${clientName}/${certificateId}"
-    headers:
-      X-Vault-Token: "[#VAULT_TOKEN]"
-      Content-Type: application/json
-    body:
-      data:
-        private_key: ${privateKey}
-  result: vault_result
-  error: return_certificate_generation_failed
   next: return_certificates
 
 return_certificates:
