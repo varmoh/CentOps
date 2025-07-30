@@ -5,7 +5,8 @@ SELECT client_id,
        argo_app_deployment_name,
        authentication_certificate,
        created_at,
-       updated_at
+       updated_at,
+       part_of_network
 FROM clients
 WHERE client_id = :client_id::uuid
   AND id = (SELECT max(id) FROM clients WHERE client_id = :client_id::uuid)
