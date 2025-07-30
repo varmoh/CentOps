@@ -24,6 +24,9 @@ get_cookie_info:
   #next: check_cookie_info_response
 logstep:
   log: ${res}
+logstepUSERROLE:
+  log: ${res.response.body.authorities}
+
 
 check_cookie_info_response:
   switch:
