@@ -16,15 +16,15 @@ declaration:
         type: string
       - field: argoAppDeploymentName
         type: string
-      - field: authenticationCertificate
-        type: string
+      - field: partOfNetwork
+        type: boolean
     params:
       - field: clientId
         type: string
 
 validate_request_param:
   switch:
-    - condition: ${incoming.params.clientId == null || incoming.body.name == null || incoming.body.kubernetesClusterAddress == null || incoming.body.kubernetesClusterNamespace == null || incoming.body.argoAppDeploymentName == null || incoming.body.authenticationCertificate == null || incoming.headers == null || incoming.headers.cookie == null}
+    - condition: ${incoming.params.clientId == null || incoming.body.name == null || incoming.body.kubernetesClusterAddress == null || incoming.body.kubernetesClusterNamespace == null || incoming.body.argoAppDeploymentName == null || incoming.body.partOfNetwork == null || incoming.headers == null || incoming.headers.cookie == null}
       next: return_bad_request
   next: assign_parameters
 
@@ -35,7 +35,7 @@ assign_parameters:
     kubernetes_cluster_address: ${incoming.body.kubernetesClusterAddress}
     kubernetes_cluster_namespace: ${incoming.body.kubernetesClusterNamespace}
     argo_app_deployment_name: ${incoming.body.argoAppDeploymentName}
-    authentication_certificate: ${incoming.body.authenticationCertificate}
+    part_of_network: ${incoming.body.partOfNetwork}
   next: call_create_user_log_template
 
 call_create_user_log_template:
@@ -59,7 +59,7 @@ send_request:
       kubernetes_cluster_address: ${kubernetes_cluster_address}
       kubernetes_cluster_namespace: ${kubernetes_cluster_namespace}
       argo_app_deployment_name: ${argo_app_deployment_name}
-      authentication_certificate: ${authentication_certificate}
+      part_of_network: ${part_of_network}
   result: update_result
   next: return_updated
 
@@ -70,5 +70,5 @@ return_updated:
 
 return_bad_request:
   status: 400
-  return: "clientId, name, kubernetesClusterAddress, kubernetesClusterNamespace, argoAppDeploymentName, authenticationCertificate and cookie are required"
+  return: "clientId, name, kubernetesClusterAddress, kubernetesClusterNamespace, argoAppDeploymentName, partOfNetwork and cookie are required"
   next: end
