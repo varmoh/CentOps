@@ -21,12 +21,7 @@ get_cookie_info:
       cookie: ${incoming.headers.cookie}
     plaintext: "customJwtCookie"
   result: res
-  #next: check_cookie_info_response
-logstep:
-  log: ${res}
-logstepUSERROLE:
-  log: ${res.response.body.authorities}
-
+  next: check_cookie_info_response
 
 check_cookie_info_response:
   switch:
@@ -36,6 +31,8 @@ check_cookie_info_response:
 
 check_user_authority:
   switch:
+    - condition: ${res.response.body === null}
+      next: return_unauthorized
     - condition: ${res.response.body.authorities.includes("ROLE_ADMINISTRATOR")}
       next: return_authorized
   next: return_unauthorized
