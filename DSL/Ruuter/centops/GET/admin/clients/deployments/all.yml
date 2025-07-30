@@ -11,11 +11,22 @@ declaration:
       - field: clientId
         type: string
         description: "Unique identifier of the client"
+      - field: page
+        type: number
+      - field: pageSize
+        type: number
 
 check_for_required_parameters:
   switch:
     - condition: ${incoming.params.clientId == null}
       next: return_incorrect_request
+  next: assign_parameters
+
+assign_parameters:
+  assign:
+    clientId: ${incoming.params.clientId}
+    page: ${incoming.params.page ?? 1}
+    page_size: ${incoming.params.pageSize ?? 10}
   next: get_deployments
 
 get_deployments:
@@ -23,15 +34,27 @@ get_deployments:
   args:
     url: "[#CENTOPS_RESQL]/get-deployments-by-client-id"
     body:
-      client_id: ${incoming.params.clientId}
-  result: results
-  next: return_result
+      client_id: ${clientId}
+      page: ${page}
+      page_size: ${page_size}
+  result: deployments_result
 
-return_result:
-  wrapper: false
-  status: 200
-  return: ${results.response.body}
-  next: end
+  transform:
+    call: http.post
+    args:
+      url: "[#CENTOPS_DMAPPER_HBS]/transform-deployments"
+      headers:
+        type: "json"
+      body:
+        entries: ${deployments_result.response.body}
+        page: ${page}
+        pageSize: ${page_size}
+    result: deployments
+
+  return_deployments:
+    status: 200
+    return: ${deployments.response.body}
+    next: end
 
 return_incorrect_request:
   status: 400
