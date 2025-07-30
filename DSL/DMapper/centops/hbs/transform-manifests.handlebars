@@ -1,0 +1,17 @@
+{
+"items": [
+{{#each entries}}
+    {
+    "manifestId": "{{manifestId}}",
+    "clientId": "{{clientId}}",
+    "name": "{{name}}",
+    "helmVersion": "{{helmVersion}}",
+    "createdAt": "{{createdAt}}",
+    "updatedAt": {{#if updatedAt}}"{{updatedAt}}"{{else}}null{{/if}}
+    }{{#unless @last}},{{/unless}}
+{{/each}}
+],
+"page": {{page}},
+"pageSize": {{pageSize}},
+"totalPages": {{#if entries.[0]}}{{entries.[0].totalPages}}{{else}}0{{/if}}
+}
