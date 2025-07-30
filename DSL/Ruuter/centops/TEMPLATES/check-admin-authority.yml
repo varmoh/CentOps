@@ -21,7 +21,9 @@ get_cookie_info:
       cookie: ${incoming.headers.cookie}
     plaintext: "customJwtCookie"
   result: res
-  next: check_cookie_info_response
+  #next: check_cookie_info_response
+logstep:
+  log: ${res}
 
 check_cookie_info_response:
   switch:
