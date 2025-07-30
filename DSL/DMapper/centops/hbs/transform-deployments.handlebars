@@ -1,0 +1,19 @@
+{
+"items": [
+{{#each entries}}
+    {
+    "id": "{{id}}",
+    "clientId": "{{clientId}}",
+    "manifestVersion": "{{manifestVersion}}",
+    "deployedByIdCode": "{{deployedByIdCode}}",
+    "argoDeployAppName": "{{argoDeployAppName}}",
+    "deployedBy": "{{deployedBy}}",
+    "status": "{{status}}",
+    "createdAt": "{{createdAt}}"
+    }{{#unless @last}},{{/unless}}
+{{/each}}
+],
+"page": {{page}},
+"pageSize": {{pageSize}},
+"totalPages": {{#if entries.[0]}}{{entries.[0].totalPages}}{{else}}0{{/if}}
+}
