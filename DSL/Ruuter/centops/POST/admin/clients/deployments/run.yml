@@ -67,7 +67,7 @@ get_client_data:
 
 check_client_data:
   switch:
-    - condition: ${client_result.response.body[0].kubernetesClusterNamespace == null || client_result.response.body[0].name == null}
+    - condition: ${client_result.response.body[0] == null || client_result.response.body[0].kubernetesClusterNamespace == null || client_result.response.body[0].name == null}
       next: return_incorrect_request
   next: extract_client_data
 
@@ -176,6 +176,16 @@ save_positive_deployment_data:
       argo_deploy_app_name: ${argoAppName}
       argo_deployment_id: ${argoDeploymentId}
   result: deployment_positive_result
+  next: save_manifest_deployment_data
+
+save_manifest_deployment_data:
+  call: http.post
+  args:
+    url: "[#CENTOPS_RESQL]/update-deployed-manifest"
+    body:
+      client_id: ${clientId}
+      manifest_id: ${manifestId}
+  result: manifest_save_deployed_results
   next: return_successful_result
 
 save_negative_deployment_data:
