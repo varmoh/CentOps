@@ -7,7 +7,8 @@
     "name": "{{name}}",
     "helmVersion": "{{helmVersion}}",
     "createdAt": "{{createdAt}}",
-    "updatedAt": {{#if updatedAt}}"{{updatedAt}}"{{else}}null{{/if}}
+    "updatedAt": {{#if updatedAt}}"{{updatedAt}}"{{else}}null{{/if}},
+    "deployedAt": {{#if deployedAt}}"{{deployedAt}}"{{else}}null{{/if}}
     }{{#unless @last}},{{/unless}}
 {{/each}}
 ],
