@@ -39,22 +39,22 @@ get_deployments:
       page_size: ${page_size}
   result: deployments_result
 
-  transform:
-    call: http.post
-    args:
-      url: "[#CENTOPS_DMAPPER_HBS]/transform-deployments"
-      headers:
-        type: "json"
-      body:
-        entries: ${deployments_result.response.body}
-        page: ${page}
-        pageSize: ${page_size}
-    result: deployments
+transform:
+  call: http.post
+  args:
+    url: "[#CENTOPS_DMAPPER_HBS]/transform-deployments"
+    headers:
+      type: "json"
+    body:
+      entries: ${deployments_result.response.body}
+      page: ${page}
+      pageSize: ${page_size}
+  result: deployments
 
-  return_deployments:
-    status: 200
-    return: ${deployments.response.body}
-    next: end
+return_deployments:
+  status: 200
+  return: ${deployments.response.body}
+  next: end
 
 return_incorrect_request:
   status: 400
