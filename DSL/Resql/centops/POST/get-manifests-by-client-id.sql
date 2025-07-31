@@ -4,6 +4,7 @@ SELECT manifest_id,
        helm_version,
        created_at,
        updated_at,
+       deployed_at,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM manifests
 WHERE client_id = :client_id::uuid
