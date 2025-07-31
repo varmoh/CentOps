@@ -7,5 +7,6 @@ SELECT client_id,
 FROM clients c
 WHERE id = (SELECT max(id) FROM clients WHERE client_id = c.client_id)
   AND deleted = FALSE
+  AND part_of_network = TRUE
 ORDER BY id
 OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER ) LIMIT :page_size::INTEGER;
