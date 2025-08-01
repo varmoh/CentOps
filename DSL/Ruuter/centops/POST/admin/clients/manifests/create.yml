@@ -63,8 +63,8 @@ create_manifest:
 
 return_result:
   wrapper: false
-  status: 200
-  return: ${results.response.body}
+  status: 201
+  return: "Manifest created successfully"
   next: end
 
 return_incorrect_request:
