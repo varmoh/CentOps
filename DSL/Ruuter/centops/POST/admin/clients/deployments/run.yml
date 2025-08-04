@@ -135,7 +135,7 @@ trigger_argo_cd_deployment:
         source:
           path: "[#GITHUB_HELM_PATH]"
           repoURL: "[#GITHUB_URL]"
-          targetRevision: master
+          targetRevision: dev
           plugin:
             env:
               - name: HELM_VALUES
