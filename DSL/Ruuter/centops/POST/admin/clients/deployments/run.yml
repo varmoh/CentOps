@@ -148,11 +148,6 @@ trigger_argo_cd_deployment:
             - CreateNamespace=true
   result: argocd_run_result
   error: save_negative_deployment_data
-  #next: check_argocd_response
-  next: log_argocd_response
-
-log_argocd_response:
-  log: ${argo_cd_response}
   next: check_argocd_response
 
 check_argocd_response:
