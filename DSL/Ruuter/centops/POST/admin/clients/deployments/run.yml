@@ -152,9 +152,7 @@ trigger_argo_cd_deployment:
   next: log_argocd_response
 
 log_argocd_response:
-  log:
-    level: error
-    message: "Argo CD deployment response: ${argo_cd_response}"
+  log: ${argo_cd_response}
   next: check_argocd_response
 
 check_argocd_response:
