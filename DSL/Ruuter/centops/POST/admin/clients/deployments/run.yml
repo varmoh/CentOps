@@ -98,6 +98,11 @@ extract_manifest_data:
   assign:
     helm_version: ${manifest_result.response.body[0].helmVersion}
     helm_values: ${manifest_result.response.body[0].helmValues}
+  next: escape_helm_values
+
+escape_helm_values:
+  assign:
+    escaped_helm_values: ${helm_values.replace('\n', '\\n').replace('"', '\\"')}
   next: call_create_user_log_template
 
 call_create_user_log_template:
@@ -139,7 +144,7 @@ trigger_argo_cd_deployment:
           plugin:
             env:
               - name: HELM_VALUES
-                value: ${helm_values}
+                value: "${escaped_helm_values}"
         syncPolicy:
           automated:
             prune: true
@@ -148,7 +153,6 @@ trigger_argo_cd_deployment:
             - CreateNamespace=true
   result: argocd_run_result
   error: save_negative_deployment_data
-  #next: check_argocd_response
 
 logstepARGO:
   log: ${argocd_run_result}
