@@ -1,0 +1,63 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Duplicate manifest"
+  method: put
+  accepts: json
+  returns: json
+  namespace: centops
+  allowlist:
+    params:
+      - field: clientId
+        type: string
+        description: "Unique identifier of the client"
+      - field: manifestId
+        type: number
+        description: "Unique identifier of the manifest"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.params.clientId == null || incoming.params.manifestId}
+      next: return_incorrect_request
+  next: extract_request_params
+
+extract_request_params:
+  assign:
+    client_id: ${incoming.params.clientId}
+    manifest_id: ${incoming.params.manifestId}
+  next: call_create_user_log_template
+
+call_create_user_log_template:
+  template: "[#CENTOPS_PROJECT_LAYER]/log-user-request"
+  requestType: templates
+  body:
+    method: "POST"
+    path: "admin/clients/manifests/duplicate"
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: duplicate_manifest
+
+duplicate_manifest:
+  call: http.post
+  args:
+    url: "[#CENTOPS_RESQL]/duplicate-manifest"
+    body:
+      client_id: ${client_id}
+      manifest_id: ${manifest_id}
+  result: results
+  next: return_result
+
+return_result:
+  wrapper: false
+  status: 201
+  return: "Manifest created successfully"
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter are missing: clientId, helmVersion or helmValues or manifestId or cookie"
+  next: end
