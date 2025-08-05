@@ -7,4 +7,4 @@ SELECT name,
        environment,
        TRUE
 FROM secrets
-WHERE id = CAST(:id AS BIGINT) AND client_id = CAST(:client_id AS BIGINT)
+WHERE id = CAST(:id AS BIGINT) AND client_id = :client_id::uuid
