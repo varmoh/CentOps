@@ -10,5 +10,5 @@ SELECT
     client_name,
     CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM vault_api_action_log
-ORDER BY id
+ORDER BY created_at desc
 OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER ) LIMIT :page_size::INTEGER;
