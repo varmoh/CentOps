@@ -109,18 +109,8 @@ save_certificate_metadata:
 check_certificate_metadata_response:
   switch:
     - condition: ${200 <= certificate_metadata_result.response.statusCodeValue && certificate_metadata_result.response.statusCodeValue < 300}
-      next: update_certificate_for_client
+      next: assign_certificate_metadata
   next: return_certificate_generation_failed
-
-update_certificate_for_client:
-  call: http.post
-  args:
-    url: "[#CENTOPS_RESQL]/update-client-certificate"
-    body:
-      client_id: ${clientId}
-      authentication_certificate: ${publicKey}
-  result: update_result
-  next: assign_certificate_metadata
 
 assign_certificate_metadata:
   assign:
