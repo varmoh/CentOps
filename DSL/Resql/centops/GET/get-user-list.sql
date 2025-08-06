@@ -8,5 +8,5 @@ SELECT user_id,
 FROM users u
 WHERE u.id = (SELECT max(id) FROM users WHERE user_id = u.user_id)
   AND u.deleted = false
-ORDER BY id
+ORDER BY first_name, last_name
 OFFSET ((GREATEST(:page::INTEGER, 1) - 1) * :page_size::INTEGER ) LIMIT :page_size::INTEGER;
