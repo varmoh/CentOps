@@ -137,6 +137,7 @@ trigger_argo_cd_deployment:
           repoURL: "[#GITHUB_URL]"
           targetRevision: master
           plugin:
+            name: avp
             env:
               - name: HELM_VALUES
                 value: ${helm_values}
