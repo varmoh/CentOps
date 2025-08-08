@@ -1,6 +1,7 @@
 SELECT client_id,
        name,
        kubernetes_cluster_namespace,
+       kubernetes_cluster_address,
        argo_app_deployment_name
 FROM clients
 WHERE client_id = :client_id::uuid
