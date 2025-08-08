@@ -74,6 +74,7 @@ check_client_data:
 extract_client_data:
   assign:
     namespace: ${client_result.response.body[0].kubernetesClusterNamespace}
+    cluster: ${client_result.response.body[0].kubernetesClusterAddress}
     clientName: ${client_result.response.body[0].name}
     argoAppName: ${client_result.response.body[0].argoAppDeploymentName}
   next: get_manifest_data
@@ -130,14 +131,13 @@ trigger_argo_cd_deployment:
       spec:
         destination:
           namespace: ${namespace}
-          server: "[#KUBERNETES_SERVER]"
+          server: ${cluster}
         project: default
         source:
           path: "[#GITHUB_HELM_PATH]"
           repoURL: "[#GITHUB_URL]"
           targetRevision: master
           plugin:
-            name: argocd-vault-plugin-helm
             env:
               - name: HELM_VALUES
                 value: ${helm_values}
