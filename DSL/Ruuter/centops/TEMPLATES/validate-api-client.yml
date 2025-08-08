@@ -19,13 +19,13 @@ validate_credentials:
     body:
       authorization: ${incoming.headers.authorization}
   result: db_result
-  next: log
+  next: check_validation_result
   
 check_validation_result:
   switch:
-    - condition: ${db_result == null || db_result.response == null || db_result.response.body[0] == null || db_result.response.body[0].isValid == false}
-      next: return_unauthorized
-  next: return_authorized
+    - condition: ${db_result.response.body[0].isValid === "true"}
+      next: return_authorized
+  next: return_unauthorized
 
 return_authorized:
   return: true
