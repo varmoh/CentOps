@@ -15,7 +15,7 @@ authenticate:
 
 check_validity:
   switch:
-    - condition: ${is_valid === "true"}
+    - condition: ${is_valid !== "false"}
       next: guard_success
   next: guard_fail
 
