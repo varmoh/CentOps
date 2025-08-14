@@ -1,0 +1,66 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Delete a specific application"
+  method: delete
+  accepts: json
+  returns: json
+  namespace: centops
+  allowlist:
+    params:
+      - field: appName
+        type: string
+        description: "The name of the Argo CD application"
+
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.params.appName == null}
+      next: return_incorrect_request
+  next: extract_request_data
+
+extract_request_data:
+  assign:
+    appName: ${incoming.params.appName}
+    next: call_create_user_log_template
+
+call_create_user_log_template:
+  template: "[#CENTOPS_PROJECT_LAYER]/log-user-request"
+  requestType: templates
+  body:
+    method: "DELETE"
+    path: "admin/clients/deployments/delete"
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: log_result
+  next: delete_argo_app
+
+delete_argo_app:
+  call: http.delete
+  args:
+    url: "[#ARGO_CD_SERVER]/api/v1/applications/${appName}"
+    headers:
+      Authorization: "Bearer [#ARGO_CD_TOKEN]"
+      Content-Type: application/json
+  result: delete_result
+  next: check_response
+
+check_response:
+  switch:
+    - condition: ${200 <= delete_result.response.statusCodeValue && delete_result.response.statusCodeValue < 300}
+      next: return_success
+  next: return_server_error
+
+return_success:
+  status: 200
+  return: "Application was deleted successfully"
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter missing: appName"
+  next: end
+
+return_server_error:
+  status: 500
+  return: "Couldn't delete application"
+  next: end
