@@ -6,7 +6,7 @@ import {
   Icon,
   Track,
 } from 'components';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ApiClient } from 'types/client';
 import { createColumnHelper, type SortingState } from '@tanstack/react-table';
 import { TransButton } from 'i18n/trans/button';
@@ -20,6 +20,7 @@ import api from 'services/api';
 import { initialPaginationData, type Pagination } from 'types/pagination';
 import { usePagination } from 'hooks/usePagination';
 import { formatDate } from 'utils/date';
+import type { ApiCluster } from 'types/cluster';
 
 export const ClientListPage = withAuthorization(() => {
   const [pagination, setPagination] = usePagination();
@@ -29,6 +30,30 @@ export const ClientListPage = withAuthorization(() => {
     queryKey: [`/admin/clients`, ...Object.values(pagination)],
     initialData: initialPaginationData<ApiClient>(),
   });
+  const [clustersPagination] = usePagination({
+    pageIndex: 0,
+    pageSize: 1000,
+  });
+  const {
+    data: { items: clusters },
+  } = useQuery<Pagination<ApiCluster>>({
+    meta: { pagination: clustersPagination },
+    queryKey: ['admin/clusters', ...Object.values(pagination)],
+    initialData: initialPaginationData<ApiCluster>(),
+  });
+  const [clustersMap, setClustersMap] =
+    useState<Map<string, { name: string; ipAddress: string }>>();
+  useEffect(() => {
+    setClustersMap(
+      new Map(
+        clusters.map(({ clusterId, name, ipAddress }) => [
+          clusterId,
+          { name, ipAddress },
+        ])
+      )
+    );
+  }, [clusters]);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const handleDelete = useCallback(async ({ clientId }: ApiClient) => {
     await api.delete(`/admin/clients?clientId=${clientId}`);
@@ -50,7 +75,11 @@ export const ClientListPage = withAuthorization(() => {
       columnHelper.accessor('kubernetesClusterAddress', {
         id: 'clusterAddress',
         header: () => <TransTableHead i18nKey="cluster" />,
-        cell: (message) => message.getValue(),
+        cell: (message) => {
+          const value = message.getValue();
+          const cluster = clustersMap?.get(value);
+          return (cluster && `${cluster.name} (${cluster.ipAddress})`) ?? value;
+        },
       }),
       columnHelper.accessor('updatedAt', {
         id: 'updatedAt',
@@ -86,7 +115,7 @@ export const ClientListPage = withAuthorization(() => {
         ),
       }),
     ],
-    []
+    [clustersMap]
   );
 
   return (
