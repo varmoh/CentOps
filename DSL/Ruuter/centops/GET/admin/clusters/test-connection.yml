@@ -31,7 +31,10 @@ query_cluster_status:
       Authorization: "Bearer [#ARGO_CD_TOKEN]"
       Content-Type: application/json
   result: clusters_result
-  next: check_response
+  #next: check_response
+
+logstep:
+  log: ${clusters_result.response.body}
 
 check_response:
   switch:
@@ -39,8 +42,6 @@ check_response:
       next: parse_cluster_status
   next: return_failed_status
 
-logstep:
-  log: ${clusters_result.response.body}
 
 parse_cluster_status:
   switch:
