@@ -11,54 +11,51 @@ declaration:
       - field: clusterName
         type: string
         description: "The name of the Kubernetes cluster"
-  
-  check_for_required_parameters:
-    switch:
-      - condition: ${incoming.params.clusterName == null}
-        next: return_incorrect_request
-    next: extract_request_data
-  
-  extract_request_data:
-    assign:
-      clusterName: ${incoming.params.clusterName}
-    next: query_cluster_status
-  
-  query_cluster_status:
-    call: http.get
-    args:
-      url: "[#ARGO_CD_SERVER]/api/v1/clusters"
-      headers:
-        Authorization: "Bearer [#ARGO_CD_TOKEN]"
-        Content-Type: application/json
-    result: clusters_result
-    next: check_response
-  
-  check_response:
-    switch:
-      - condition: ${clusters_result.response.statusCodeValue >= 200 && clusters_result.response.statusCodeValue < 300}
-        next: parse_cluster_status
-    next: return_failed_status
-  
-  parse_cluster_status:
-    assign:
-      matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
-    switch:
-      - condition: ${matched_cluster == undefined}
-        next: return_failed_status
-    next: return_success
-  
-  return_success:
-    wrapper: false
-    return: ${matched_cluster.connectionState?.status || "UNKNOWN"}
-    next: end
-  
-  return_incorrect_request:
-    status: 400
-    return: "Required parameter missing: clusterName"
-    next: end
-  
-  return_failed_status:
-    status: 400
-    return: "Connection status was failed or cluster doesn't exist"
-    next: end
 
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.params.clusterName == null}
+      next: return_incorrect_request
+  next: extract_request_data
+
+extract_request_data:
+  assign:
+    clusterName: ${incoming.params.clusterName}
+  next: query_cluster_status
+
+query_cluster_status:
+  call: http.get
+  args:
+    url: "[#ARGO_CD_SERVER]/api/v1/clusters"
+    headers:
+      Authorization: "Bearer [#ARGO_CD_TOKEN]"
+      Content-Type: application/json
+  result: clusters_result
+  next: check_response
+
+check_response:
+  switch:
+    - condition: ${clusters_result.response.statusCodeValue >= 200 && clusters_result.response.statusCodeValue < 300}
+      next: parse_cluster_status
+  next: return_failed_status
+
+parse_cluster_status:
+  switch:
+    - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
+      next: return_failed_status
+  next: return_success
+
+return_success:
+  wrapper: false
+  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState?.status}
+  next: end
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter missing: clusterName"
+  next: end
+
+return_failed_status:
+  status: 400
+  return: "Connection status was failed or cluster doesn't exist"
+  next: end
