@@ -53,6 +53,11 @@ check_matched_cluster:
       next: return_failed_status
   next: return_success
 
+return_incorrect_request:
+  status: 400
+  return: "Required parameter missing: clusterName"
+  next: end
+
 return_success:
   wrapper: false
   return: "Successful"
