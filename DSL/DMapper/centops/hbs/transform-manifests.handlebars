@@ -5,10 +5,12 @@
     "manifestId": "{{manifestId}}",
     "clientId": "{{clientId}}",
     "name": "{{name}}",
-    "helmVersion": "{{helmVersion}}",
+    "gitHelmBranch": "{{gitHelmBranch}}",
     "createdAt": "{{createdAt}}",
     "updatedAt": {{#if updatedAt}}"{{updatedAt}}"{{else}}null{{/if}},
-    "deployedAt": {{#if deployedAt}}"{{deployedAt}}"{{else}}null{{/if}}
+    "deployedAt": {{#if deployedAt}}"{{deployedAt}}"{{else}}null{{/if}},
+    "gitHelmRepository": {{#if gitHelmRepository}}"{{gitHelmRepository}}"{{else}}null{{/if}},
+    "gitHelmPath": {{#if gitHelmPath}}"{{gitHelmPath}}"{{else}}null{{/if}}
     }{{#unless @last}},{{/unless}}
 {{/each}}
 ],
