@@ -43,14 +43,19 @@ check_response:
   next: return_failed_status
 
 parse_cluster_status:
+  assign:
+    matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
+  next: check_matched_cluster
+
+check_matched_cluster:
   switch:
-    - condition: ${clusters_result.response.body.items.some(obj => obj.name === clusterName) == false}
+    - condition: ${matched_cluster == null}
       next: return_failed_status
   next: return_success
 
 return_success:
   wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState?.status}
+  return: ${matched_cluster.connectionState.status}
   next: end
 
 return_incorrect_request:
