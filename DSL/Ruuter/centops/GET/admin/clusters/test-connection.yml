@@ -51,7 +51,19 @@ check_matched_cluster:
   switch:
     - condition: ${matched_cluster == null || matched_cluster.connectionState == null}
       next: return_failed_status
-  next: return_success
+  next: return_cluster_status
+
+return_cluster_status:
+  wrapper: false
+  # You can return the actual connection state (e.g., "Healthy", "Unhealthy") 
+  # or just "Successful" if you prefer simple success/failure
+  return: ${matched_cluster.connectionState.status}
+  next: end
+
+return_failed_status:
+  wrapper: false
+  return: "Failed"
+  next: end
 
 return_incorrect_request:
   status: 400
@@ -61,10 +73,5 @@ return_incorrect_request:
 return_success:
   wrapper: false
   return: "Successful"
-  next: end
-
-return_failed_status:
-  wrapper: 400
-  return: "Failed"
   next: end
 
