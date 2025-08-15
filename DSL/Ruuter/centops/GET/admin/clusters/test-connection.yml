@@ -38,8 +38,10 @@ log_connection_state:
 
 check_response:
   switch:
+    # Transport-level success
     - condition: ${clusters_result.response.statusCodeValue >= 200 && clusters_result.response.statusCodeValue < 300}
       next: parse_cluster_status
+  # Transport-level failure
   next: return_failed_status
 
 parse_cluster_status:
@@ -49,16 +51,18 @@ parse_cluster_status:
 
 check_matched_cluster:
   switch:
-    # If cluster doesn't exist or connectionState is missing
-    - condition: ${matched_cluster == null || matched_cluster.connectionState == null}
+    # Cluster-level failure: not found or connectionState missing or not CONNECTED
+    - condition: ${matched_cluster == null || matched_cluster.connectionState == null || matched_cluster.connectionState.status != "CONNECTED"}
       next: return_failed_status
-  # If cluster exists and has connectionState
+  # Cluster-level success
   next: return_success
 
 return_success:
+  wrapper: false
   status: 200
-  return: ${matched_cluster.connectionState.status}
+  return: ${matched_cluster.connectionState}
   next: end
+
 
 return_failed_status:
   status: 400
