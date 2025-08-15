@@ -49,7 +49,7 @@ parse_cluster_status:
 
 return_success:
   wrapper: false
-  return: ${matched_cluster.connectionState || "UNKNOWN"}
+  return: ${matched_cluster.connectionState.status || "UNKNOWN"}
   next: end
 
 return_incorrect_request:
