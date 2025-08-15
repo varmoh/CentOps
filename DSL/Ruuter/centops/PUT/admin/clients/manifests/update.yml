@@ -12,17 +12,23 @@ declaration:
         type: string
         description: "Unique identifier of the client"
       - field: manifestId
-        type: number
+        type: string
         description: "Unique identifier of the manifest"
       - field: name
         type: string
         description: "Name of the manifest"
-      - field: helmVersion
+      - field: gitHelmBranch
         type: string
         description: "Helm version of a deployment"
       - field: helmValues
         type: string
         description: "Helm values of a deployment"
+      - field: gitHelmRepository
+        type: string
+        description: "git repository"
+      - field: gitHelmPath
+        type: string
+        description: "Helm path in the git repository"
     headers:
       - field: cookie
         type: string
@@ -30,7 +36,7 @@ declaration:
 
 check_for_required_parameters:
   switch:
-    - condition: ${incoming.body.clientId == null || incoming.body.helmVersion == null || incoming.body.helmValues == null || incoming.body.name == null || incoming.body.manifestId == null || incoming.headers == null || incoming.headers.cookie == null}
+    - condition: ${incoming.body.clientId == null || incoming.body.gitHelmBranch == null || incoming.body.gitHelmPath == null || incoming.body.helmValues == null || incoming.body.gitHelmRepository || incoming.body.name == null || incoming.body.manifestId == null || incoming.headers == null || incoming.headers.cookie == null}
       next: return_incorrect_request
   next: extract_request_params
 
@@ -39,8 +45,10 @@ extract_request_params:
     client_id: ${incoming.body.clientId}
     manifest_id: ${incoming.body.manifestId}
     name: ${incoming.body.name}
-    helm_version: ${incoming.body.helmVersion}
+    git_helm_branch: ${incoming.body.gitHelmBranch}
     helm_values: ${incoming.body.helmValues}
+    git_helm_repository: ${incoming.body.gitHelmRepository}
+    git_helm_path: ${incoming.body.gitHelmPath}
   next: call_create_user_log_template
 
 call_create_user_log_template:
@@ -61,8 +69,10 @@ update_manifest:
       client_id: ${client_id}
       manifest_id: ${manifest_id}
       name: ${name}
-      helm_version: ${helm_version}
+      git_helm_branch: ${git_helm_branch}
       helm_values: ${helm_values}
+      git_helm_repository: ${git_helm_repository}
+      git_helm_path: ${git_helm_path}
   result: results
   next: return_result
 
