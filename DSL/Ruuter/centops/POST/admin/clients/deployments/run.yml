@@ -12,7 +12,7 @@ declaration:
         type: string
         description: "Unique client id"
       - field: manifestId
-        type: number
+        type: string
         description: "Unique manifest id"
     headers:
       - field: cookie
@@ -84,21 +84,24 @@ get_manifest_data:
   args:
     url: "[#CENTOPS_RESQL]/get-manifests-details"
     body:
-      manifest_id: ${manifestId}
       client_id: ${clientId}
+      manifest_id: ${manifestId}
   result: manifest_result
   next: check_manifest_data
 
 check_manifest_data:
   switch:
-    - condition: ${manifest_result.response.body[0].helmVersion == null || manifest_result.response.body[0].helmValues == null }
+    - condition: ${manifest_result.response.body[0].gitHelmBranch == null || manifest_result.response.body[0].helmValues == null }
       next: return_incorrect_request
   next: extract_manifest_data
 
 extract_manifest_data:
   assign:
-    helm_version: ${manifest_result.response.body[0].helmVersion}
+    manifestName: ${manifest_result.response.body[0].name}
     helm_values: ${manifest_result.response.body[0].helmValues}
+    git_helm_repository: ${manifest_result.response.body[0].gitHelmRepository}
+    git_helm_path: ${manifest_result.response.body[0].gitHelmPath}
+    git_helm_branch: ${manifest_result.response.body[0].gitHelmBranch}
   next: call_create_user_log_template
 
 call_create_user_log_template:
@@ -134,9 +137,9 @@ trigger_argo_cd_deployment:
           server: ${cluster}
         project: default
         source:
-          path: "[#GITHUB_HELM_PATH]"
-          repoURL: "[#GITHUB_URL]"
-          targetRevision: dev
+          path: ${git_helm_path}
+          repoURL: ${git_helm_repository}
+          targetRevision: ${git_helm_branch}
           plugin:
             env:
               - name: HELM_VALUES
@@ -169,7 +172,8 @@ save_positive_deployment_data:
     body:
       client_id: ${clientId}
       manifest_id: ${manifestId}
-      manifest_version: ${helm_version}
+      manifest_name: ${manifestName}
+      manifest_git_helm_branch: ${git_helm_branch}
       status: "DEPLOYED"
       deployed_by_id_code: ${userIdCode}
       deployed_by_username: ${firstName}
@@ -196,7 +200,8 @@ save_negative_deployment_data:
     body:
       client_id: ${clientId}
       manifest_id: ${manifestId}
-      manifest_version: ${helm_version}
+      manifest_name: ${manifestName}
+      manifest_git_helm_branch: ${git_helm_branch}
       status: "FAILED"
       deployed_by_id_code: ${userIdCode}
       deployed_by_username: ${firstName}
@@ -231,5 +236,5 @@ return_unsuccessful_result:
 
 return_incorrect_request:
   status: 400
-  return: "Required parameters missing: client_id, secretId or manifestId or cookie"
+  return: "Required parameters missing: client_id or manifestId or cookie"
   next: end
