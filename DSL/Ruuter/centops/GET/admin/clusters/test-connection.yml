@@ -37,8 +37,7 @@ logstep:
   log: ${clusters_result.response.body.}
 
 log_connection_state:
-  log: ${clusters_result.response.body.items.map(obj => obj.connectionState)}
-  next: end
+  log: ${clusters_result.response.body.items[*].connectionState}
 
 check_response:
   switch:
