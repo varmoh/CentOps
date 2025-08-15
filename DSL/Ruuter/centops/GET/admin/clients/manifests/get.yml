@@ -12,8 +12,8 @@ declaration:
         type: string
         description: "Unique identifier of the client"
       - field: manifestId
-        type: number
-        description: "Manifest Id '"
+        type: string
+        description: "Manifest Id"
 
 check_for_required_parameters:
   switch:
