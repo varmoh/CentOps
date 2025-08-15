@@ -44,14 +44,16 @@ check_response:
 
 
 parse_cluster_status:
+  assign:
+    matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
   switch:
-    - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
+    - condition: ${matched_cluster === undefined}
       next: return_failed_status
   next: return_success
 
 return_success:
   wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState?.status}
+  return: ${matched_cluster.connectionState.status}
   next: end
 
 return_incorrect_request:
