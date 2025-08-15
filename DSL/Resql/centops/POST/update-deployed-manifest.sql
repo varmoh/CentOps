@@ -1,19 +1,27 @@
 WITH origin AS (
     UPDATE manifests
         SET deleted = true
-        WHERE client_id = :client_id::uuid AND manifest_id = CAST(:manifest_id AS BIGINT)
-        RETURNING created_at, name, helm_values, helm_version, client_id
-),
-     inserted AS (
-         INSERT INTO manifests (client_id, name, helm_version, helm_values, created_at, deployed_at)
-             SELECT
-                 origin.client_id,
-                 origin.name,
-                 origin.helm_version,
-                 origin.helm_values,
-                 origin.created_at,
-                 NOW()
-             FROM origin
-             RETURNING manifest_id
-     )
-SELECT manifest_id FROM inserted;
+        WHERE client_id = :client_id::uuid
+            AND manifest_id = :manifest_id::uuid
+            AND deleted = false
+        RETURNING client_id, manifest_id, name, git_helm_branch, helm_values, created_at, git_helm_repository, git_helm_path)
+INSERT INTO manifests (client_id,
+                manifest_id,
+                name,
+                git_helm_branch,
+                helm_values,
+                created_at,
+                deployed_at,
+                git_helm_repository,
+                git_helm_path)
+SELECT client_id,
+       manifest_id,
+       name,
+       git_helm_branch,
+       helm_values,
+       created_at,
+       NOW(),
+       git_helm_repository,
+       git_helm_path
+FROM origin
+RETURNING manifest_id;
