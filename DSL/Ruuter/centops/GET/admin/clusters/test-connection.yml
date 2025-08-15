@@ -39,6 +39,9 @@ check_response:
       next: parse_cluster_status
   next: return_failed_status
 
+logstep:
+  log: ${clusters_result.response.body}
+
 parse_cluster_status:
   switch:
     - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
