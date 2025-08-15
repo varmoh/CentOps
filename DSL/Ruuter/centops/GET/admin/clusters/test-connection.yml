@@ -34,7 +34,11 @@ query_cluster_status:
   #next: check_response
 
 logstep:
-  log: ${clusters_result.response.body}
+  log: ${clusters_result.response.body.}
+
+log_connection_state:
+  log: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState}
+  next: end
 
 check_response:
   switch:
