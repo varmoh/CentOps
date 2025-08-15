@@ -38,7 +38,7 @@ log_connection_state:
 
 check_response:
   switch:
-    - condition: ${clusters_result.response.status == 'Successful'}
+    - condition: ${clusters_result.response.statusCodeValue >= 200 && clusters_result.response.statusCodeValue < 300}
       next: parse_cluster_status
   next: return_failed_status
 
@@ -49,29 +49,20 @@ parse_cluster_status:
 
 check_matched_cluster:
   switch:
+    # If cluster doesn't exist or connectionState is missing
     - condition: ${matched_cluster == null || matched_cluster.connectionState == null}
       next: return_failed_status
-  next: return_cluster_status
+  # If cluster exists and has connectionState
+  next: return_success
 
-return_cluster_status:
-  wrapper: false
-  # You can return the actual connection state (e.g., "Healthy", "Unhealthy") 
-  # or just "Successful" if you prefer simple success/failure
+return_success:
+  status: 200
   return: ${matched_cluster.connectionState.status}
   next: end
 
 return_failed_status:
-  wrapper: 400
-  return: "Failed"
-  next: end
-
-return_incorrect_request:
   status: 400
-  return: "Required parameter missing: clusterName"
+  return: "Connection status failed or cluster doesn't exist"
   next: end
 
-return_success:
-  wrapper: false
-  return: "Successful"
-  next: end
 
