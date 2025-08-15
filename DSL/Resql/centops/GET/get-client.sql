@@ -1,6 +1,6 @@
 SELECT client_id,
        name,
-       kubernetes_cluster_address,
+       kubernetes_cluster_id,
        kubernetes_cluster_namespace,
        argo_app_deployment_name,
        authentication_certificate,
