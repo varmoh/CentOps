@@ -34,7 +34,7 @@ query_cluster_status:
   #next: check_response
 
 log_connection_state:
-  log: ${clusters_result.response.body.items.connectionState}
+  log: ${clusters_result.response.body.metadata.items.connectionState}
 
 check_response:
   switch:
