@@ -33,9 +33,6 @@ query_cluster_status:
   result: clusters_result
   #next: check_response
 
-logstep:
-  log: ${clusters_result.response.body.}
-
 log_connection_state:
   log: ${clusters_result.response.body.items.connectionState}
 
@@ -45,18 +42,15 @@ check_response:
       next: parse_cluster_status
   next: return_failed_status
 
-
 parse_cluster_status:
-  assign:
-    matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
   switch:
-    - condition: ${matched_cluster === undefined}
+    - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
       next: return_failed_status
   next: return_success
 
 return_success:
   wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState?.status}
+  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState}
   next: end
 
 return_incorrect_request:
