@@ -12,7 +12,7 @@ declaration:
         type: string
         description: "Unique identifier of the client"
       - field: manifestId
-        type: number
+        type: string
         description: "Unique identifier of the manifest"
     headers:
       - field: cookie
