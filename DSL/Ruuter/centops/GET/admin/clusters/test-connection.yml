@@ -29,7 +29,7 @@ query_cluster_status:
     url: "[#ARGO_CD_SERVER]/api/v1/clusters"
     headers:
       Authorization: "Bearer [#ARGO_CD_TOKEN]"
-      Content-Type: application/json
+      Content-Type: application/json"
   result: clusters_result
   next: check_response
 
@@ -40,14 +40,16 @@ check_response:
   next: return_failed_status
 
 parse_cluster_status:
+  assign:
+    matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
   switch:
-    - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
+    - condition: ${matched_cluster == null}
       next: return_failed_status
   next: return_success
 
 return_success:
   wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState}
+  return: ${matched_cluster.connectionState || "UNKNOWN"}
   next: end
 
 return_incorrect_request:
