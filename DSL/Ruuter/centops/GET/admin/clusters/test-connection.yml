@@ -61,7 +61,7 @@ return_cluster_status:
   next: end
 
 return_failed_status:
-  wrapper: false
+  wrapper: 400
   return: "Failed"
   next: end
 
