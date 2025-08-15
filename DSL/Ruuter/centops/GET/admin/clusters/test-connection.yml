@@ -50,7 +50,7 @@ parse_cluster_status:
 
 return_success:
   wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState}
+  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState.status}
   next: end
 
 return_incorrect_request:
