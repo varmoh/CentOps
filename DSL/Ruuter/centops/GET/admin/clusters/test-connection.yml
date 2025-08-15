@@ -35,27 +35,32 @@ query_cluster_status:
 
 check_response:
   switch:
-    - condition: ${clusters_result.response.statusCodeValue >= 200 && clusters_result.response.statusCodeValue < 300}
+    - condition: ${clusters_result.response.status == 'Successful'}
       next: parse_cluster_status
   next: return_failed_status
 
 parse_cluster_status:
+  assign:
+    matched_cluster: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)}
+  next: check_matched_cluster
+
+check_matched_cluster:
   switch:
-    - condition: ${clusters_result.response.body.items.find(obj => obj.name === clusterName) === undefined}
+    - condition: ${matched_cluster == null || matched_cluster.connectionState == null}
       next: return_failed_status
   next: return_success
-
-return_success:
-  wrapper: false
-  return: ${clusters_result.response.body.items.find(obj => obj.name === clusterName)?.connectionState}
-  next: end
 
 return_incorrect_request:
   status: 400
   return: "Required parameter missing: clusterName"
   next: end
 
+return_success:
+  wrapper: false
+  return: "Successful"
+  next: end
+
 return_failed_status:
-  status: 400
+  wrapper: false
   return: "Connection status was failed or cluster doesn't exist"
   next: end
