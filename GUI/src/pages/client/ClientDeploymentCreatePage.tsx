@@ -52,7 +52,7 @@ export const ClientDeploymentCreatePage = withAuthorization(() => {
       try {
         await api.post(`admin/clients/deployments/run`, {
           clientId,
-          manifestId: parseInt(manifestId),
+          manifestId,
         });
         navigate(
           replaceLinkParams(ROUTES.CLIENT_DEPLOYMENTS_ROUTE, { clientId })
