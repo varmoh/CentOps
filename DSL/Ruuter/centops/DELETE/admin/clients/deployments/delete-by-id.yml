@@ -1,0 +1,60 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Mark a deployment as deleted"
+  method: delete
+  accepts: json
+  returns: json
+  namespace: centops
+  allowlist:
+    params:
+      - field: deploymentId
+        type: string
+    headers:
+      - field: cookie
+        type: string
+      - field: x-forwarded-for
+        type: string
+
+validate_request_param:
+  switch:
+    - condition: ${incoming.params.deploymentId == null || incoming.headers == null || incoming.headers.cookie == null}
+      next: return_bad_request
+  next: assign_parameters
+
+assign_parameters:
+  assign:
+    deployment_id: ${incoming.params.deploymentId}
+    ip_address: ${incoming.headers[Object.keys(incoming.headers).find(h => h.toLowerCase() === 'x-forwarded-for')] || 'unknown'}
+  next: call_create_user_log_template
+
+call_create_user_log_template:
+  template: "[#CENTOPS_PROJECT_LAYER]/log-user-request"
+  requestType: templates
+  body:
+    method: "DELETE"
+    path: "admin/clients/deployments/delete-by-id"
+    ip_address: ${ip_address}
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: log_result
+  next: send_request
+
+send_request:
+  call: http.post
+  args:
+    url: "[#CENTOPS_RESQL]/delete-deployment"
+    body:
+      deployment_id: ${deployment_id}
+  result: delete_result
+  next: return_deleted_deployment
+
+return_deleted_deployment:
+  status: 204
+  return:
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "deploymentId and cookie are required"
+  next: end
