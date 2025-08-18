@@ -18,6 +18,8 @@ declaration:
       - field: cookie
         type: string
         description: "Cookie field"
+      - field: x-forwarded-for
+        type: string
 
 get_user_info:
   call: http.post
@@ -42,6 +44,7 @@ assign_user_data:
     userIdCode: ${user_info_response.response.body.idCode}
     firstName: ${user_info_response.response.body.firstName}
     lastName: ${user_info_response.response.body.lastName}
+    ip_address: ${incoming.headers[Object.keys(incoming.headers).find(h => h.toLowerCase() === 'x-forwarded-for')] || 'unknown'}
   next: check_for_required_parameters
 
 check_for_required_parameters:
@@ -130,6 +133,7 @@ call_create_user_log_template:
   body:
     method: "POST"
     path: "admin/clients/deployments/run"
+    ip_address: ${ip_address}
   headers:
     cookie: ${incoming.headers.cookie}
   result: create_log_result
