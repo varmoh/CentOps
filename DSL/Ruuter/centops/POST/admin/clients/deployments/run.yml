@@ -96,7 +96,7 @@ check_cluster_data:
 
 extract_cluster_data:
   assign:
-    ipAddress: ${cluster_result.response.body[0].ipAddress}
+    cluster: ${cluster_result.response.body[0].ipAddress}
   next: get_manifest_data
 
 get_manifest_data:
