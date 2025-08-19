@@ -6,8 +6,7 @@ INSERT INTO manifests (name,
                        deleted,
                        created_at,
                        git_helm_repository,
-                       git_helm_path
-)
+                       git_helm_path)
 SELECT name,
        client_id,
        manifest_id,
@@ -18,5 +17,7 @@ SELECT name,
        git_helm_repository,
        git_helm_path
 FROM manifests
-WHERE manifest_id = :manifest_id::uuid AND client_id = :client_id::uuid;
-
+WHERE manifest_id = :manifest_id::uuid
+  AND client_id = :client_id::uuid
+  AND id = (SELECT max(id) FROM manifests WHERE manifest_id = :manifest_id::uuid)
+  AND deleted = false;
