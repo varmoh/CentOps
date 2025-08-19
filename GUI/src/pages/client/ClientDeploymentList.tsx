@@ -325,7 +325,6 @@ export const ClientDeploymentList = withAuthorization(() => {
           <DataTable
             data={deployments.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={deployments.totalPages}
             setPagination={setPagination}
