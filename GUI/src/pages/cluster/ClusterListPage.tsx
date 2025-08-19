@@ -106,7 +106,6 @@ export const ClusterListPage = withAuthorization(() => {
           <DataTable
             data={clusters.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={clusters.totalPages}
             setPagination={setPagination}
