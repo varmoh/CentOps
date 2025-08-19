@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, Card, FormInput, FormYamlEditor, Track } from 'components';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { TransButton } from 'i18n/trans/button';
@@ -22,6 +22,7 @@ export const ClientManifestDetailsPage = withAuthorization(() => {
     clientId: string;
     manifestId: 'create' | string;
   }>();
+  const { backUrl } = useLocation().state ?? {};
   const isCreateMode = manifestId === 'create';
 
   const { data: client } = useQuery<ApiClient>({
@@ -109,7 +110,7 @@ export const ClientManifestDetailsPage = withAuthorization(() => {
         onSubmit={handleSubmit(onSubmit)}
         footer={
           <Track justify="between">
-            <Link to={ROUTES.CLIENT_MANIFESTS_ROUTE}>
+            <Link to={backUrl ?? ROUTES.CLIENT_MANIFESTS_ROUTE}>
               <Button appearance="primary" outlined>
                 <TransButton i18nKey="cancel" />
               </Button>
