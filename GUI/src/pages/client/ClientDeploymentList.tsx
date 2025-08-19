@@ -160,6 +160,13 @@ export const ClientDeploymentList = withAuthorization(() => {
             <ConfirmDeleteButton
               appearance="text"
               entity={original}
+              entityName={({
+                manifestName,
+                manifestGitHelmBranch,
+                createdAt,
+              }) =>
+                `${manifestName} ${manifestGitHelmBranch} (${formatDate(createdAt)})`
+              }
               onConfirm={handleDeleteById}
             >
               <Icon name="delete" />
@@ -265,18 +272,6 @@ export const ClientDeploymentList = withAuthorization(() => {
                 >
                   <Icon name="heart" size="medium" />
                   {status?.status}
-                </Title>
-              </strong>
-            </Card>
-            <Card style={{ flexGrow: 1, flexBasis: 0 }} shadow>
-              <strong className="h5">
-                <Trans
-                  i18nKey="client.deployments.status.lastSync"
-                  defaults="Last sync"
-                />
-                <Title className="h1" type="success">
-                  <Icon name="check-circle" size="medium" />
-                  OK
                 </Title>
               </strong>
             </Card>
