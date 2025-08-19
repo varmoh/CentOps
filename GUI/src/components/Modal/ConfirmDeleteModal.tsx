@@ -1,6 +1,6 @@
 import { Button, Modal, Track } from 'components';
 import type { ModalProps } from 'components/Modal/index';
-import { type FC, type ReactNode, useCallback, useState } from 'react';
+import { type FC, type ReactNode, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ButtonProps } from 'components/Button';
 import { useToast } from 'hooks';
@@ -16,14 +16,14 @@ export interface ConfirmDeleteModalProps extends Omit<ModalProps, 'title'> {
 export interface ConfirmDeleteButtonProps<T>
   extends Omit<ButtonProps, 'title'> {
   entity: T;
-  entityName?: keyof T & string;
+  entityName?: (keyof T & string) | ((entity: T) => string);
   onConfirm: (entity: T) => Promise<void>;
   title?: ReactNode;
 }
 
 export const ConfirmDeleteButton = <T,>({
   entity,
-  entityName,
+  entityName: getEntityName,
   onConfirm,
   title,
   ...props
@@ -58,20 +58,26 @@ export const ConfirmDeleteButton = <T,>({
       });
     }
   }, [entity]);
+  const entityName = useMemo(() => {
+    if (typeof getEntityName === 'function') {
+      return getEntityName(entity);
+    }
+    return get(entity, getEntityName ?? '', '');
+  }, [entity]);
 
   return (
     <>
       <Button onClick={showConfirmDeleteModal} {...props} />
       {Boolean(entityToDelete) && (
         <ConfirmDeleteModal
-          name={get(entity, entityName ?? '', '')}
+          name={entityName}
           onConfirm={handleConfirm}
           onClose={closeConfirmDeleteModal}
           title={
             title ??
             t('dialog.confirmDeleteTitle.title', {
               defaultValue: 'Do you want to delete {{name}}?',
-              name: get(entity, entityName ?? '', ''),
+              name: entityName,
             })
           }
         />
