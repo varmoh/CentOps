@@ -41,7 +41,7 @@ export const ClientManifestListPage = withAuthorization(() => {
   const handleDelete = useCallback(
     async ({ manifestId }: ApiClientManifest) => {
       await api.delete(
-        `/admin/clients/manifests?clientId=${clientId}&manifestId=${manifestId}`
+        `/admin/clients/manifests/delete?clientId=${clientId}&manifestId=${manifestId}`
       );
       refetch();
     },
