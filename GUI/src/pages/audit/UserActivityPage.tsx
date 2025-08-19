@@ -99,7 +99,6 @@ export const UserActivityPage = withAuthorization(() => {
           <DataTable
             data={logs.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={logs.totalPages}
             setPagination={setPagination}
