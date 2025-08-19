@@ -49,7 +49,6 @@ delete_manifest:
   next: return_result
 
 return_result:
-  wrapper: false
   status: 204
   return: ${results.response.body}
   next: end
