@@ -134,7 +134,6 @@ export const ClientSecretListPage = withAuthorization(() => {
           <DataTable
             data={secrets.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={secrets.totalPages}
             setPagination={setPagination}
