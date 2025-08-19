@@ -157,7 +157,6 @@ export const ClientManifestListPage = withAuthorization(() => {
           <DataTable
             data={manifests.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={manifests.totalPages}
             setPagination={setPagination}
