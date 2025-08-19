@@ -39,6 +39,7 @@ export const TransButton = createTrans({
   newDeployment: (
     <Trans i18nKey="button.newDeployment" defaults="New deployment" />
   ),
+  revoke: <Trans i18nKey="button.revoke" defaults="Revoke" />,
   rollback: <Trans i18nKey="button.rollback" defaults="Rollback" />,
   save: <Trans i18nKey="button.save" defaults="Save" />,
   secrets: <Trans i18nKey="button.secrets" defaults="Secrets" />,
