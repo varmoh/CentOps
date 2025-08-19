@@ -126,7 +126,7 @@ export const ClientCertificateList = withAuthorization(() => {
               disabled={getValue()}
             >
               <Icon name="delete" />
-              <TransButton i18nKey="delete" />
+              <TransButton i18nKey="revoke" />
             </ConfirmDeleteButton>
             <Button
               appearance="text"
