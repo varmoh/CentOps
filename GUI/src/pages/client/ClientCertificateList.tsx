@@ -184,7 +184,6 @@ export const ClientCertificateList = withAuthorization(() => {
           <DataTable
             data={certificates.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={certificates.totalPages}
             setPagination={setPagination}
