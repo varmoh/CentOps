@@ -136,7 +136,6 @@ export const ClientListPage = withAuthorization(() => {
           <DataTable
             data={clients.items}
             columns={columns}
-            sortable
             pagination={pagination}
             pagesCount={clients.totalPages}
             setPagination={setPagination}
