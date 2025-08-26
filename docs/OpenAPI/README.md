@@ -58,4 +58,12 @@ Running CentOps:
    helm upgrade --install -n centops ./Vault
    ```
 
+5. **Install CentOps**
+   ```bash
+   helm upgrade --install -n centops ./CentOps
+   ```
+
+Configurations:
+**TBD**
+
 
