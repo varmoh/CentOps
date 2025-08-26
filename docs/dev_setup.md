@@ -49,7 +49,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 ### Vault Setup 
 
-see the [README](./vault/README.md) file.
+see the [README](../vault/README.md) file.
 
 ### API Clients
 
