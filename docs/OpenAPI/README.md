@@ -55,15 +55,43 @@ Running CentOps:
 3. **Install Vault**
 
    ```bash
-   helm upgrade --install -n centops ./Vault
+   helm upgrade --install -n centops vault ./Vault
    ```
 
 5. **Install CentOps**
    ```bash
-   helm upgrade --install -n centops ./CentOps
+   helm upgrade --install -n centops centops ./CentOps
    ```
+6. **Install Auth-Layer**
+   ```bash
+   helm upgrade --install -n centops auth-layer ./Authentication-Layer
+   ```
+ 
+Configurations:  
+**CentOps**:  
 
-Configurations:
-**TBD**
+In values.yaml replace: 
 
+**Global values**: *replace example.com*  
+
+- domain: centops.example.com  
+- domainruuter: ruuter.centops.example.com  
+- secretname: centops.example.com01prod  
+- secretnameruuter: ruuter.centops.example.com01prod  
+- secretnametim: tim.centops.example.com01prod  
+- secretnameadmin: admin.centops.example.com01prod
+- 
+**Ruuter environment**: *replace CORS*
+  
+- corsAllowedOrigins: "https://admin.centops.example.com,https://tim.centops.example.com"
+  
+**TIM environment**: *replace default password*
+  
+- jwtIntegrationSignatureKeyStorePassword: "defaultpassword"
+  
+**CentOps GUI**: *replace example.com*  
+
+- reactAppApiUrl: "https://ruuter.centops.example.com/centops"  
+- REACT_APP_LOGIN_URL: "https://admin.centops.example.com/en/log-in"  
+- REACT_APP_MONITORING_URL: "https://monitoring.example.com"  
 
