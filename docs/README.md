@@ -80,7 +80,7 @@ In values.yaml replace:
 - secretnameruuter: ruuter.centops.example.com01prod  
 - secretnametim: tim.centops.example.com01prod  
 - secretnameadmin: admin.centops.example.com01prod
-- 
+
 **Ruuter environment**: *replace CORS*
   
 - corsAllowedOrigins: "https://admin.centops.example.com,https://tim.centops.example.com"
