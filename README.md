@@ -8,9 +8,9 @@ CentOps streamlines DevOps workflows by integrating client management, secrets h
 
 ### Overview & K8s setup
 
-see the [README](../docs/README.md) file.
+see the [README](./docs/README.md) file.
 
 ### Dev setup 
 
-see the [dev_setup](../docs/dev_setup.md) file.
+see the [dev_setup](./docs/dev_setup.md) file.
 
