@@ -28,7 +28,7 @@ send_request:
   result: clients_result
 
 logstepCLIENT:
-  log: ${clients_result.response} 
+  log: ${clients_result} 
 
 transform:
   call: http.post
