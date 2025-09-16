@@ -12,6 +12,9 @@ declaration:
         type: string
         description: "Base64 encoded API key:secret"
 
+logstep:
+  log: ${incoming.headers}
+
 validate_credentials:
   call: http.post
   args:
