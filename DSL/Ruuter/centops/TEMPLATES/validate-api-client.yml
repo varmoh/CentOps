@@ -12,29 +12,86 @@ declaration:
         type: string
         description: "Base64 encoded API key:secret"
 
-logstep:
-  log: ${incoming.headers}
+check_for_required_parameters:
+  switch:
+    - condition: ${incoming.headers.authorization == null || incoming.headers.authorization == ''}
+      next: return_unauthorized
+  next: extract_request_data
 
-validate_credentials:
+extract_request_data:
+  assign:
+    authorization: ${incoming.headers.authorization}
+  next: base64_decoding
+
+base64_decoding:
+  call: http.post
+  args:
+    url: "[#CENTOPS_DMAPPER]/decryption/base64"
+    body:
+      cipher: ${authorization}
+      isObject: false
+  result: parse_base64_result
+  error: return_unauthorized
+  next: check_base64_decoding_response
+
+check_base64_decoding_response:
+  switch:
+    - condition: ${200 <= parse_base64_result.response.statusCodeValue && parse_base64_result.response.statusCodeValue < 300 && parse_base64_result.response.body.error === false}
+      next: assign_parsed_auth_data
+  next: return_unauthorized
+
+assign_parsed_auth_data:
+  assign:
+    api_key_decoded: ${parse_base64_result.response.body.content.split(':').map(part => part.trim())[0]}
+    api_secret_decoded: ${parse_base64_result.response.body.content.split(':').map(part => part.trim())[1]}
+  next: apiKey_secret_base64_encoding
+
+apiKey_secret_base64_encoding:
+  call: http.post
+  args:
+    url: "[#CENTOPS_DMAPPER]/encryption/object/base64"
+    body:
+      api_key: ${api_key_decoded}
+      api_secret: ${api_secret_decoded}
+  result: encoded_auth_data_result
+  error: return_unauthorized
+  next: check_base64_encoding_response
+
+check_base64_encoding_response:
+  switch:
+    - condition: ${200 <= encoded_auth_data_result.response.statusCodeValue && encoded_auth_data_result.response.statusCodeValue < 300}
+      next: assign_encoded_auth_data
+  next: return_unauthorized
+
+assign_encoded_auth_data:
+  assign:
+    api_key_base64: ${encoded_auth_data_result.response.body.api_key}
+    api_secret_base64: ${encoded_auth_data_result.response.body.api_secret}
+  next: check_client_credentials
+
+check_client_credentials:
   call: http.post
   args:
     url: "[#CENTOPS_RESQL]/validate-api-client"
     body:
-      authorization: ${incoming.headers.authorization}
+      api_key: ${api_key_base64}
+      api_secret: ${api_secret_base64}
   result: db_result
+  error: return_unauthorized
   next: check_validation_result
-  
+
 check_validation_result:
   switch:
-    - condition: ${db_result.response.body[0].isValid === "true"}
+    - condition: ${db_result.response.body[0].isValid === true}
       next: return_authorized
   next: return_unauthorized
 
 return_authorized:
+  status: 200
   return: true
   next: end
 
 return_unauthorized:
-  status: 200
+  status: 401
   return: false
   next: end
