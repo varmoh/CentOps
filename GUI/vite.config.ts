@@ -21,7 +21,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/centops': {
-        target: 'https://ruuter.centops.test.buerokratt.ee',
+        target: 'https://ruuter.centops.stage.buerokratt.ee',
         changeOrigin: true,
         secure: false,
       },
