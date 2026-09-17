@@ -3,7 +3,7 @@ name: Build and publish GUI with
 on:
   push:
     branches:
-      - dev
+      - uustest
     paths:
       - '.env.test'
 
